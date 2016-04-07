@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <title>ol3 pgRouting client</title>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="http://openlayers.org/en/v3.5.0/css/ol.css" type="text/css">
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="http://openlayers.org/en/v3.5.0/build/ol.js"></script>
+  <style>
+  #dotInfomation {
+    z-index: 3;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 70%;
+    height: 70%;
+  }
+  #map {
+    z-index: 2;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 70%;
+    height: 70%;
+  }
+  #info {
+    z-index: 1;
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    width: 20%;
+    height: 20%;
+  }
+  </style>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <div id="dotInfomation" class="dotInfomation"></div>
+    <div id="info" class="info">&nbsp;</div>
+    <script>
+      
+      var wmsMap = new ol.layer.Tile({source: new ol.source.XYZ({
+      url : 'http://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
+      attribution  : "<a href='http://www.gsi.go.jp/kikakuchousei/kikakuchousei40182.html' target='_blank'>国土地理院</a>", 
+      })});
+      
+      var wmsSource =   new ol.source.TileWMS({
+        	url: 'http://server.titech.ichilab.org:8080/geoserver/SIP4/wms',
+        	params: {
+        			'LAYERS': 'SIP4:避難所小学校_埼玉県',
+        			},
+        	serverType: 'geoserver',
+        	crossOrigin: ''
+      	});
+
+      var wmsSourceHinan =   new ol.source.TileWMS({
+        	url: 'http://server.titech.ichilab.org:8080/geoserver/SIP4/wms',
+        	params: {
+        			'LAYERS': 'SIP4:避難所小学校_埼玉県'
+        			},
+        	serverType: 'geoserver',
+        	crossOrigin: ''
+      	});
+      	
+      	var wmsSourceRoute =   new ol.source.TileWMS({
+        	url: 'http://server.titech.ichilab.org:8080/geoserver/SIP4/wms',
+        	params: {
+        			'LAYERS': 'SIP4:災害拠点病院'
+        			},
+        	serverType: 'geoserver',
+        	crossOrigin: ''
+      	});
+      
+      var SourceHinan = new ol.layer.Tile({
+        source: wmsSourceHinan,
+        visible: true
+      });
+      	
+      var SourceRoute = new ol.layer.Tile({
+        source: wmsSourceRoute,
+        visible: true
+      });
+      
+      var view = new ol.View({
+      	center: ol.proj.transform([139.611129, 35.787558,13], 'EPSG:4326', 'EPSG:3857'),
+      	zoom: 14
+      	});
+
+      var map = new ol.Map({
+        layers: [wmsMap],
+        target: 'map',
+        transparent: true,
+        view: view,
+        renderer: ['canvas']
+      });
+      
+      //::::::::::::::::::::::::::::::::::::://
+      
+      var vectorSource = new ol.source.Vector({
+		format: new ol.format.GeoJSON(),
+		url: 'http://server.titech.ichilab.org:8080/geoserver/SIP4/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=SIP4:避難所小学校_埼玉県&maxFeatures=1000&outputFormat=application%2Fjson',
+		projection: ''
+      });
+      
+      var vectorLayer = new ol.layer.Vector({
+		source: vectorSource
+      });
+      
+      var vectorSource2 = new ol.source.Vector({
+		format: new ol.format.GeoJSON(),
+		url: 'http://server.titech.ichilab.org:8080/geoserver/SIP4/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=SIP4:災害拠点病院&maxFeatures=1000&outputFormat=application%2Fjson',
+		projection: ''
+      });
+      
+      var vectorLayer2 = new ol.layer.Vector({
+		source: vectorSource2
+      });
+      
+      var vectorSource3 = new ol.source.Vector({
+		format: new ol.format.GeoJSON(),
+		url: 'http://server.titech.ichilab.org:8080/geoserver/SIP4/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=SIP4:道路情報&maxFeatures=1000&outputFormat=application%2Fjson',
+		projection: ''
+      });
+      
+      var vectorLayer3 = new ol.layer.Vector({
+		source: vectorSource3
+      });
+      
+      //::::::::::::::::::::::::::::::::::::://
+      
+      var dotInfomation = new ol.Map({
+        layers: [vectorLayer,vectorLayer2,vectorLayer3],
+        target: 'dotInfomation',
+        transparent: true,
+        view: view,
+        renderer: ['canvas']
+      });
+      
+dotInfomation.on('singleclick', function(evt) {
+        document.getElementById('info').innerHTML = '';
+        var viewResolution = /** @type {number} */ (view.getResolution());
+        var url = wmsSource.getGetFeatureInfoUrl(
+            evt.coordinate, viewResolution, 'EPSG:3857',
+            {'INFO_FORMAT': 'text/html'});
+        if (url) {
+          document.getElementById('info').innerHTML =
+              '<iframe seamless src="' + url + '"></iframe>';
+        }
+      });
+
+      dotInfomation.on('pointermove', function(evt) {
+        if (evt.dragging) {
+          return;
+        }
+        var pixel = dotInfomation.getEventPixel(evt.originalEvent);
+        var hit = dotInfomation.forEachLayerAtPixel(pixel, function() {
+          return true;
+        });
+        dotInfomation.getTargetElement().style.cursor = hit ? 'pointer' : '';
+      });
+
+      
+    </script>
+  </body>
+</html>
