@@ -159,15 +159,15 @@
         });
         console.log(label);
         console.log(label2);
-        if (label.length > 0 && label2 == undefined) {
+        if (label2 == "undefined") {
             var element = overlayHinan.getElement();
             element.innerHTML = label;
             overlayHinan.setPosition(coordinate);
             dotInfomationHinan.addOverlay(overlayHinan);
-        } else if (label == undefined && label2.length > 0) {
-            var element2 = overlayHosp.getElement();
+        } else if (label == "undefined" ) {
+            var element2 = overlayHinan.getElement();
             element2.innerHTML = label2;
-            overlayHosp.setPosition(coordinate);
+            overlayHinan.setPosition(coordinate);
             dotInfomationHinan.addOverlay(overlayHinan);
         }
     });
