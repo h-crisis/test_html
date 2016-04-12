@@ -49,9 +49,10 @@
       
       // json形式の情報を取得 //
       var wmsSourceHinan =   new ol.source.TileWMS({
-        	url:  'http://server.titech.ichilab.org:8080/geoserver/SIP4/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=SIP4:道路情報&maxFeatures=1000&outputFormat=application%2Fjson',
+        	url:  'http://server.titech.ichilab.org:8080/geoserver/SIP4/wms',
         	// ↑のpath.jsonを、jsonファイルの存在するパスに設定 //
-        	serverType: 'geoserver',
+            params : {'LAYERS': '避難所小学校_埼玉県'},
+            serverType: 'geoserver',
         	crossOrigin: ''
       	});
       	
@@ -85,8 +86,7 @@
       
       var vectorSource = new ol.source.Vector({
 		format: new ol.format.GeoJSON(),
-		url: 'http://server.titech.ichilab.org:8080/geoserver/SIP4/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=SIP4:道路情報&maxFeatures=1000&outputFormat=application%2Fjson',
-		// ↑のpath.jsonを、jsonファイルの存在するパスに設定 //
+		url: 'http://server.titech.ichilab.org:8080/geoserver/SIP4/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=SIP4:避難所小学校_埼玉県&maxFeatures=819&outputFormat=application%2Fjson',		// ↑のpath.jsonを、jsonファイルの存在するパスに設定 //
 		projection: ''
       });
       
@@ -146,7 +146,9 @@
         var viewResolution = /** @type {number} */ (view.getResolution());
         var url = wmsSourceHinan.getGetFeatureInfoUrl(
             evt.coordinate, viewResolution, 'EPSG:3857',
-            {'INFO_FORMAT': 'text/html'});
+            {'INFO_FORMAT': 'text/html',
+                'propertyName': 'A27_003,A27_004'
+            });
         if (url) {
           document.getElementById('info').innerHTML =
               '<iframe seamless src="' + url + '"></iframe>';
