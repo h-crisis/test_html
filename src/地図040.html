@@ -16,7 +16,14 @@
             width: 80%;
             height: 70%;
         }
-
+        #dotInfomationHosp {
+            z-index: 3;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            width: 80%;
+            height: 70%;
+        }
         #map {
             z-index: 2;
             position: absolute;
@@ -25,23 +32,14 @@
             width: 80%;
             height: 70%;
         }
-        #info {
-            z-index: 1;
-            position: absolute;
-            bottom: 0px;
-            left: 0px;
-            width: 20%;
-            height: 20%;
-        }
     </style>
 </head>
 <body>
 <div id="map" class="map"></div>
 <div id="dotInfomationHinan" class="dotInfomationHinan"></div>
 
-<div id="overlayHinan" style="background-color:white; border: 1px solid black; padding: 5px 10px;"></div>
+<div id="overlayHinan" style="background-color:burlywood; border: 1px solid black; padding: 5px 10px;"></div>
 
-<div id="info" class="info">&nbsp;</div>
 <script>
 
     // 国土地理院からラスタ形式の地図情報を取得 //
@@ -86,21 +84,19 @@
         projection: ''
     });
 
+    var vectorSourceHosp = new ol.source.Vector({
+        format: new ol.format.GeoJSON(),
+        url: 'http://server.titech.ichilab.org:8080/geoserver/SIP4/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=SIP4:災害拠点病院&maxFeatures=1000&outputFormat=application%2Fjson',		// ↑のpath.jsonを、jsonファイルの存在するパスに設定 //
+        projection: ''
+    });
+
     var vectorLayerHinan = new ol.layer.Vector({
         source: vectorSourceHinan
     });
 
-
-
-     var vectorSource2 = new ol.source.Vector({
-     format: new ol.format.GeoJSON(),
-     url: 'http://server.titech.ichilab.org:8080/geoserver/SIP4/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=SIP4:災害拠点病院&maxFeatures=1000&outputFormat=application%2Fjson',
-     projection: ''
-     });
-
-     var vectorLayer2 = new ol.layer.Vector({
-     source: vectorSource2,
-     });
+    var vectorLayerHosp = new ol.layer.Vector({
+        source: vectorSourceHosp
+    });
 
     /* geoserver上のファイルをソースとして取得する例
      ::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -118,13 +114,15 @@
      ::::::::::::::::::::::::::::::::::::::::::*/
 
     // vectorSourceから得られた描写情報を基に、マップ上に線や点をプロット //
+
     var dotInfomationHinan = new ol.Map({
-        layers: [vectorLayerHinan],
+        layers: [vectorLayerHinan,vectorLayerHosp],
         target: 'dotInfomationHinan',
         transparent: true,
         view: view,
         renderer: ['canvas']
     });
+
 
     /* ↑と同じ作業
 
@@ -143,23 +141,36 @@
         positioning: 'bottom-center'
     });
 
+    var overlayHosp = new ol.Overlay({
+        element: document.getElementById('overlayHosp'),
+        positioning: 'bottom-center'
+    });
+
     // クリックした地点の情報を取得し、表示する //
     dotInfomationHinan.on('singleclick', function(e) {
         var coordinate = e.coordinate;
         var pixel = dotInfomationHinan.getPixelFromCoordinate(coordinate);
         var label = '';
+        var label2 = '';
         dotInfomationHinan.forEachFeatureAtPixel(pixel, function(feature){
             // the attribute data of GeoJSON of USGS earthquake data.
             label += feature.get('A27_003');
+            label2 += feature.get('NAME');
         });
-        if (label.length > 0) {
+        console.log(label);
+        console.log(label2);
+        if (label.length > 0 && label2 == undefined) {
             var element = overlayHinan.getElement();
             element.innerHTML = label;
             overlayHinan.setPosition(coordinate);
             dotInfomationHinan.addOverlay(overlayHinan);
+        } else if (label == undefined && label2.length > 0) {
+            var element2 = overlayHosp.getElement();
+            element2.innerHTML = label2;
+            overlayHosp.setPosition(coordinate);
+            dotInfomationHinan.addOverlay(overlayHinan);
         }
     });
-
 
 
 
