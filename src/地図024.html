@@ -1,0 +1,201 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- OpenLayers library filesの読み込み -->
+<script src="http://openlayers.org/api/OpenLayers.js"></script>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+<script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+
+<script type="text/javascript">
+ 
+  // 座標系の設定
+  var projection3857 = new OpenLayers.Projection("EPSG:3857");
+  var projection4326 = new OpenLayers.Projection("EPSG:4326");
+  
+  var map = null;
+  var vector_layer;
+  var popup = null;
+  
+  function init_map(){
+    
+    // マップの生成
+    map = new OpenLayers.Map({
+      div: "map",
+      projection: projection3857,
+      displayProjection: projection4326});
+    
+  
+ 
+    // レイヤーの生成
+    map.addLayer(new OpenLayers.Layer.XYZ(
+         "標準地図",  // レイヤー名
+         "http://cyberjapandata.gsi.go.jp/xyz/std/${z}/${x}/${y}.png", // url
+          { 
+            // options(attribution:帰属,,minZoomLevel:最小倍率(未使用),maxZoomLevel:最大倍率)
+            attribution  : "<a href='http://www.gsi.go.jp/kikakuchousei/kikakuchousei40182.html' target='_blank'>国土地理院</a>", 
+            maxZoomLevel : 18,
+            wrapDateLine : true
+          },{isBaseLayer : true}
+          ));
+
+    var vector_format = new OpenLayers.Format.GeoJSON({});
+    
+			var vector_protocol = new OpenLayers.Protocol.HTTP({
+                    url : 'ex6_data.json',
+                    format : vector_format
+                    });
+                    
+            var vector_strategies = [new OpenLayers.Strategy.Fixed()];
+ 
+                //Create a vector layer that contains a Format, Protocol, and Strategy class
+                vector_layer = new OpenLayers.Layer.Vector(
+                    'More Advanced Vector Layer', {
+                    protocol : vector_protocol,
+                    strategies : vector_strategies,
+                    projection: projection4326,
+					 displayProjection: projection4326,
+					 id  : ["properties"]["N03_001"],   //地域コード
+ 					name: ["properties"]["N03_003"],    //地域名
+					format : new OpenLayers.Format.GeoJSON()});
+ 
+                map.addLayer(vector_layer);
+
+var jso 
+
+
+
+d3.json("ex6_data.json", function(json) {
+  jso = json.features[1].properties.N03_003;
+  console.log(jso);
+  document.write(jso);
+});
+
+
+    // Controlを追加
+    map.addControl(new OpenLayers.Control.LayerSwitcher({'div':OpenLayers.Util.getElement('layerswitcher')}));
+ 
+    // マップの中心を設定
+ map.setCenter(new OpenLayers.LonLat(
+                        139.611129, // X:経度
+                        35.787558  // Y:緯度
+                      ).transform(projection4326, projection3857),// 座標系 
+                      15 // デフォルトズームレベル
+                      );
+    
+ // マーカーリストの生成      
+    var markers = new OpenLayers.Layer.Markers("Markers");
+    map.addLayer(markers);
+    
+    
+var points = [
+    ['白子１丁目：人口5,525人',35.767172,139.622266],
+    ['白子２丁目：人口7,706人',35.773421,139.620599],
+    ['白子３丁目：人口7,937人',35.784878,139.623898],
+    ['白子４丁目：人口221人',35.793148,139.638565],
+    ['南１丁目：人口6,540人',35.773557,139.618562],
+    ['南２丁目：人口1,016人',35.772712,139.606237],
+    ['中央１丁目：人口6,86人',35.784862,139.611587],
+    ['中央２丁目：人口1,462人',35.782733,139.616701],
+    ['新倉１丁目：人口6,339人',35.789239,139.612414],
+    ['新倉２丁目：人口6,688人',35.791971,139.619000],
+    ['新倉３丁目：人口1,714人',35.793614,139.621891],
+    ['新倉４丁目：人口156人',35.797793,139.623659],
+    ['新倉５丁目：人口データ無し',35.800970,139.618020],
+    ['新倉６丁目：人口0人',35.806025,139.620245],
+    ['新倉７丁目：人口データ無し',35.800743,139.625553],
+    ['新倉８丁目：人口52人',35.800163,139.625780],
+    ['本町：人口8,404人',35.787558,139.611129],
+    ['諏訪：人口352人',35.777556,139.619275],
+    ['広沢：人口3,975人',35.787442,139.613555],
+    ['西大和団地：人口2,866人',35.789239,139.612414],
+    ['諏訪原団地：人口1,097人',35.775728,139.615219],
+    ['大字下新倉：人口0人',35.799736,139.637580],
+    ['下新倉１丁目：人口730人',35.788371,139.614050],
+    ['下新倉２丁目：人口3,114人',35.788139,139.617150],
+    ['下新倉３丁目：人口2,695人',35.791206,139.620003],
+    ['下新倉４丁目：人口3,152人',35.792590,139.621849],
+    ['下新倉５丁目：人口1,693人',35.794500,139.628190],
+    ['下新倉６丁目：人口37人',35.798427,139.630972],
+    ['大字新倉：人口0人',35.773557,139.618562],
+    ['丸山台１丁目：人口974人',35.787442,139.613555],
+    ['丸山台２丁目：人口2,840人',35.786620,139.615644],
+    ['丸山台３丁目：人口1,996人',35.784456,139.619982]
+    ];
+ 
+/* for文で markers.length の配列要素分、繰り返し処理を行います。*/
+d3.json("ex6_data.json", function(json) {
+  var total_Features = json.totalFeatures;
+  
+  
+for (var i = 0; i <  total_Features; i++) {
+ 
+/* 配列markers[i][0]を変数nameに格納 */
+
+
+  var name = json.features[i].properties.N03_004;
+
+  console.log(name);
+
+
+
+ 
+ }
+ 
+});
+
+  }
+  
+  // マーカーイベント
+  function onMarkerMouseClick(evt){
+    if (popup) map.removePopup(popup); 
+    popup = new OpenLayers.Popup.FramedCloud(
+              "Popup",        // id               {String}
+              new OpenLayers.LonLat(evt.object.x, evt.object.y).transform( projection4326, projection3857), // lonlat {OpenLayers.LonLat}
+              null,           // contentSize      {OpenLayers.Size}
+              evt.object.tag, // contentHTML      {String}
+              null,           // anchor           {Object}
+              false,          // closeBox         {Boolean}
+              null);          // closeBoxCallback {Function}
+    map.addPopup(popup);
+  }
+  
+  // onloadイベント
+  window.onload = function() {
+    
+    // マップの生成(経度、緯度、倍率、最大倍率)
+    init_map(139.611129,35.787558,13,20);
+    
+  }
+     
+</script>
+<style type="text/css">
+ 
+  /* 国土地理院の出典表示用 */
+  body {padding: 0; margin: 0}
+  div.olControlAttribution {
+    padding: 3px;
+    color:#000000;
+    background-color:#ffffff;
+    background-color:rgba(230,255,255,0.7);
+    font-size:12px;
+    line-height:14px;
+    bottom:5px;
+    vertical-align: middle;
+  }
+</style>
+</head>
+<body>
+
+
+
+<!-- map表示のためのHTML elementの作成 -->
+<div id="map" style="height: 900px; width: 75%;"></div>
+
+<div id="layerswitcher" class="olControlLayerSwitcher"></div>
+    <div id="map" class="smallmap"></div>
+    
+
+</body>
+</html>
