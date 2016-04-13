@@ -6,6 +6,8 @@
     <link rel="stylesheet" href="http://openlayers.org/en/v3.5.0/css/ol.css" type="text/css">
     <script src="http://d3js.org/d3.v3.min.js"></script>
     <script src="http://openlayers.org/en/v3.5.0/build/ol.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <style>
 
         #dotInfomationHinan {
@@ -39,7 +41,7 @@
 <div id="dotInfomationHinan" class="dotInfomationHinan"></div>
 
 <div id="overlayHinan" style="background-color:burlywood; border: 1px solid black; padding: 5px 10px;"></div>
-
+<div id="overlayHosp" style="background-color:white; border: 1px solid black; padding: 5px 10px;"></div>
 <script>
 
     // 国土地理院からラスタ形式の地図情報を取得 //
@@ -47,21 +49,6 @@
         url : 'http://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
         attribution  : "<a href='http://www.gsi.go.jp/kikakuchousei/kikakuchousei40182.html' target='_blank'>国土地理院</a>",
     })});
-
-
-
-    /* geoserverから取得する場合
-
-     var wmsSourceHospital =   new ol.source.TileWMS({
-     url: 'http://server.titech.ichilab.org:8080/geoserver/SIP4/wms',
-     params: {
-     'LAYERS': 'SIP4:災害拠点病院'
-     },
-     serverType: 'geoserver',
-     crossOrigin: ''
-     });
-
-     */
 
     // 地図の初期表示地域を和光市周辺に
     var view = new ol.View({
@@ -78,6 +65,7 @@
         renderer: ['canvas']
     });
 
+    // GeoJson情報をベクタ形式で取得
     var vectorSourceHinan = new ol.source.Vector({
         format: new ol.format.GeoJSON(),
         url: 'http://server.titech.ichilab.org:8080/geoserver/SIP4/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=SIP4:避難所小学校_埼玉県&maxFeatures=819&outputFormat=application%2Fjson',		// ↑のpath.jsonを、jsonファイルの存在するパスに設定 //
@@ -95,7 +83,13 @@
     });
 
     var vectorLayerHosp = new ol.layer.Vector({
-        source: vectorSourceHosp
+        source: vectorSourceHosp,
+        style : new ol.style.Style({
+            stroke : new ol.style.Stroke({
+                color: [0, 153, 255, 1],
+                width: 2
+            })
+        })
     });
 
     /* geoserver上のファイルをソースとして取得する例
@@ -113,7 +107,7 @@
 
      ::::::::::::::::::::::::::::::::::::::::::*/
 
-    // vectorSourceから得られた描写情報を基に、マップ上に線や点をプロット //
+    // vectorSourceから得られた描写情報を基に、マップ上に線や点をプロット
 
     var dotInfomationHinan = new ol.Map({
         layers: [vectorLayerHinan,vectorLayerHosp],
@@ -122,7 +116,6 @@
         view: view,
         renderer: ['canvas']
     });
-
 
     /* ↑と同じ作業
 
@@ -136,35 +129,64 @@
 
      */
 
+    // プロットした情報にオーバーレイヤを追加する準備
     var overlayHinan = new ol.Overlay({
         element: document.getElementById('overlayHinan'),
         positioning: 'bottom-center'
     });
 
-    // クリックした地点の情報を取得し、表示する //
+    var overlayHosp = new ol.Overlay({
+        element: document.getElementById('overlayHosp'),
+        positioning: 'bottom-center'
+    });
+
+    // クリックした地点の情報を取得し、表示する
     dotInfomationHinan.on('singleclick', function(e) {
         var coordinate = e.coordinate;
         var pixel = dotInfomationHinan.getPixelFromCoordinate(coordinate);
-        var label = '';
+        var labelA = '';
+        var labelB = '';
+        var label1 = '';
         var label2 = '';
         dotInfomationHinan.forEachFeatureAtPixel(pixel, function(feature){
             // the attribute data of GeoJSON of USGS earthquake data.
-            label += feature.get('A27_003');
-            label2 += feature.get('NAME');
+            labelA += feature.get('A27_003');
+            labelB += feature.get('A27_004');
+            label1 += feature.get('NAME');
+            label2 += feature.get('ADDRESS');
         });
-        console.log(label);
+        console.log(labelA);
         console.log(label2);
-        if (label2 == "undefined") {
+        if (label1 == "undefined" & labelA.length > 0) {
+            overlayHosp.setPosition();
+            dotInfomationHinan.addOverlay(overlayHosp);
             var element = overlayHinan.getElement();
-            element.innerHTML = label;
+            element.innerHTML =
+                    "避難所名：" + labelA + '<br>' +
+                    "住所：" + labelB;
             overlayHinan.setPosition(coordinate);
             dotInfomationHinan.addOverlay(overlayHinan);
-        } else if (label == "undefined" ) {
-            var element2 = overlayHinan.getElement();
-            element2.innerHTML = label2;
-            overlayHinan.setPosition(coordinate);
+        } else if (labelA == "undefined"  & label1.length > 0) {
+            overlayHinan.setPosition();
             dotInfomationHinan.addOverlay(overlayHinan);
+            var element2 = overlayHosp.getElement();
+            element2.innerHTML =
+                    "病院名：" + label1 + '<br>' +
+                    "住所：" + label2;
+            overlayHosp.setPosition(coordinate);
+            dotInfomationHinan.addOverlay(overlayHosp);
         }
+    });
+
+    dotInfomationHinan.on('pointermove', function(evt) {
+        if (evt.dragging) {
+            return;
+        }
+        var pixel = dotInfomationHinan.getEventPixel(evt.originalEvent);
+        var hit = dotInfomationHinan.forEachLayerAtPixel(pixel, function() {
+            return true;
+        });
+        dotInfomationHinan.getTargetElement().style.cursor = hit ? 'pointer' : '';
     });
 
 
