@@ -3,11 +3,9 @@
 <head>
     <title>ol3 test</title>
     <meta charset="utf-8">
-    <link rel="stylesheet" href="http://openlayers.org/en/v3.5.0/css/ol.css" type="text/css">
-    <script src="http://d3js.org/d3.v3.min.js"></script>
-    <script src="http://openlayers.org/en/v3.5.0/build/ol.js"></script>
-    <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="http://openlayers.org/en/v3.6.0/css/ol.css" type="text/css">
+    <script src="http://openlayers.org/en/v3.6.0/build/ol.js"></script>
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
     <style>
 
         #dotInfomationHinan {
@@ -15,33 +13,32 @@
             position: absolute;
             top: 0px;
             left: 0px;
-            width: 80%;
-            height: 70%;
+            width: 100%;
+            height: 100%;
         }
         #dotInfomationHosp {
             z-index: 3;
             position: absolute;
             top: 0px;
             left: 0px;
-            width: 80%;
-            height: 70%;
+            width: 100%;
+            height: 100%;
         }
         #map {
             z-index: 2;
             position: absolute;
             top: 0px;
             left: 0px;
-            width: 80%;
-            height: 70%;
+            width: 100%;
+            height: 100%;
         }
     </style>
 </head>
 <body>
-<div id="map" class="map"></div>
 <div id="dotInfomationHinan" class="dotInfomationHinan"></div>
-<div id="overlayHinan" style="background-color:burlywood; border: 1px solid black; padding: 5px 10px;"></div>
+<div id="overlayHinan" style="background-color:whitesmoke; border: 1px solid black; padding: 5px 10px;"></div>
 <div id="overlayHosp" style="background-color:white; border: 1px solid black; padding: 5px 10px;"></div>
-<script>
+<script type="text/javascript">
 
     // 国土地理院からラスタ形式の地図情報を取得 //
     var wmsMap = new ol.layer.Tile({source: new ol.source.XYZ({
@@ -58,29 +55,32 @@
     });
 
     // wmsMapをマップとして描写するように設定
-    var map = new ol.Map({
-        layers: [wmsMap],
-        target: 'map',
-        transparent: true,
-        view: view,
-        renderer: ['canvas']
-    });
+
 
     // GeoJson情報をベクタ形式で取得
     var vectorSourceHinan = new ol.source.Vector({
         format: new ol.format.GeoJSON(),
-        url: '/Users/komori/Desktop/N03-20150101_11_GML/test/JSON_20160418.json',		// ↑のpath.jsonを、jsonファイルの存在するパスに設定 //
-        projection: ''
+        url: '/Users/komori/Desktop/N03-20150101_11_GML/test/JSON_20160419.json'		// ↑のpath.jsonを、jsonファイルの存在するパスに設定 //
     });
 
     var vectorSourceHosp = new ol.source.Vector({
         format: new ol.format.GeoJSON(),
-        url: '/Users/komori/Desktop/N03-20150101_11_GML/test/JSON_20160418.json',		// ↑のpath.jsonを、jsonファイルの存在するパスに設定 //
-        projection: ''
+        url: '/Users/komori/Desktop/N03-20150101_11_GML/test/JSON_20160419.json'		// ↑のpath.jsonを、jsonファイルの存在するパスに設定 //
+    });
+
+    var countryStyle = new ol.style.Style({
+        stroke: new ol.style.Stroke({
+            color: 'black',
+            width: 4
+        }),
+        fill : new ol.style.Fill({
+            color: 'rgba(0, 0, 0, 0)'
+        }),
     });
 
     var vectorLayerHinan = new ol.layer.Vector({
-        source: vectorSourceHinan
+        source: vectorSourceHinan,
+        style: countryStyle
     });
 
     var vectorLayerHosp = new ol.layer.Vector({
@@ -105,7 +105,7 @@
     // vectorSourceから得られた描写情報を基に、マップ上に線や点をプロット
 
     var dotInfomationHinan = new ol.Map({
-        layers: [vectorLayerHinan,vectorLayerHosp],
+        layers: [wmsMap,vectorLayerHinan,vectorLayerHosp],
         target: 'dotInfomationHinan',
         transparent: true,
         view: view,
@@ -142,23 +142,27 @@
         var pixel = dotInfomationHinan.getPixelFromCoordinate(coordinate);
         var labelA = '';
         var labelB = '';
-        var label1 = '';
-        var label2 = '';
+        var labelC = '';
+        var labelD = '';
+        var labelE = '';
         dotInfomationHinan.forEachFeatureAtPixel(pixel, function(feature){
             // the attribute data of GeoJSON of USGS earthquake data.
-            labelA += feature.get('名称');
-            labelB += feature.get('住所');
-            label1 += feature.get('asas');
-            label2 += feature.get('ADDRESS');
+            labelA = feature.get('避難所コー');
+            labelB = feature.get('名称');
+            labelC = feature.get('郵便番号');
+            labelD = feature.get('住所');
+            labelE = feature.get('二次医療圏');
         });
-        console.log(labelA);
         if (labelA.length > 0) {
             overlayHosp.setPosition();
             dotInfomationHinan.addOverlay(overlayHosp);
             var element = overlayHinan.getElement();
             element.innerHTML =
-                    "避難所名：" + labelA + '<br>' +
-                    "住所：" + labelB;
+                    "避難所コード:" + labelA + '<br>' +
+                    "避難所名    :" + labelB + '<br>' +
+                    "郵便番号    :" + labelC + '<br>' +
+                    "住所        :" + labelD + '<br>' +
+                    "二次医療圏   :" + labelE;
             overlayHinan.setPosition(coordinate);
             dotInfomationHinan.addOverlay(overlayHinan);
         }
