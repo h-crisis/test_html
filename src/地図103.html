@@ -3,42 +3,9 @@
 <head>
     <title>Vector Layer</title>
     <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="mapa.css">
     <link rel="stylesheet" href="http://openlayers.org/en/v3.15.0/css/ol.css" type="text/css">
     <script src="http://openlayers.org/en/v3.15.0/build/ol.js"></script>
-    <style>
-        #quest-vis {
-            z-index: 3;
-            position: absolute;
-            bottom: 0px;
-            left: 7%;
-            width: 5%;
-            height: 5%;
-        }
-        #osm-vis {
-            z-index: 3;
-            position: absolute;
-            bottom: 0px;
-            left: 1%;
-            width: 5%;
-            height: 5%;
-        }
-        #info {
-            z-index: 2;
-            position: absolute;
-            bottom: 0px;
-            right: 0px;
-            width: 20%;
-            height: 20%;
-        }
-        #map {
-            z-index: 1;
-            position: absolute;
-            top: 0px;
-            left: 0px;
-            width: 100%;
-            height: 100%;
-        }
-    </style>
 </head>
 <body>
 <div id="map" class="map"></div>
@@ -124,7 +91,11 @@
         layers: [ new ol.layer.Tile({source:
                 new ol.source.XYZ({
                     url : 'http://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
-                    attribution  : "<a href='http://www.gsi.go.jp/kikakuchousei/kikakuchousei40182.html' target='_blank'>国土地理院</a>"
+                    attributions: [
+                        new ol.Attribution({
+                            html: "<a href='http://www.gsi.go.jp/' target='_blank'>国土地理院</a>"})
+                    ],
+                    title: "地理院地図"
                 })}),
             vectorLayer
         ],
