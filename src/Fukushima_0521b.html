@@ -2,63 +2,138 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Fukushima0521</title>
+    <title>Title</title>
     <link rel="stylesheet" href="http://openlayers.org/en/v3.15.0/css/ol.css" type="text/css">
     <script src="http://openlayers.org/en/v3.15.0/build/ol.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
 </head>
 <body>
 <div id="map" class="map" style="z-index: 1;position: absolute;top: 0px;left: 0px;width: 100%;height: 100%;"></div>
 <div id="overlayHinan" style="background-color:whitesmoke; border: 1px solid black; padding: 5px 10px;"></div>
-<button id="distribution-vis" style="z-index: 3;position: absolute; bottom: 30%;left: 0px;width: 5%;height: 5%;">震度分布 ON/OFF</button>
-<button id="hospital-vis" style="z-index: 3;position: absolute; bottom: 25%;left: 0px;width: 5%;height: 5%;" >病院 ON/OFF</button>
-<button id="office-vis" style="z-index: 3;position: absolute; bottom: 20%;left: 0px;width: 5%;height: 5%;">役所 ON/OFF</button>
-<button id="hinan-vis" style="z-index: 3;position: absolute; bottom: 13%;left: 0px;width: 5%;height: 7%;">避難所 Day1/Day4 /Day14/OFF</button>
-<div id="info" style="z-index: 2;position: absolute;top: 0px;right: 0px;width: 20%;height: 20%;; background-color:whitesmoke; border: 2px solid burlywood; padding: 5px 10px;">&nbsp;</div>
+<button id="distribution-vis" style="z-index: 3;position: absolute; bottom: 35%;left: 0px;width: 5%;height: 5%;">震度分布 ON/OFF</button>
+<button id="hospital-vis" style="z-index: 3;position: absolute; bottom: 30%;left: 0px;width: 5%;height: 5%;" >病院 ON/OFF</button>
+<button id="office-vis" style="z-index: 3;position: absolute; bottom: 25%;left: 0px;width: 5%;height: 5%;">役所 ON/OFF</button>
+<button id="hinan1-vis" style="z-index: 3;position: absolute; bottom: 20%;left: 0px;width: 5%;height: 5%;">避難所1日目 ON/OFF</button>
+<button id="hinan4-vis" style="z-index: 3;position: absolute; bottom: 15%;left: 0px;width: 5%;height: 5%;">避難所4日目 ON/OFF</button>
+<button id="hinan14-vis" style="z-index: 3;position: absolute; bottom: 10%;left: 0px;width: 5%;height: 5%;">避難所14日目 ON/OFF</button>
+<div id="info" style="z-index: 2;position: absolute;top: 0px;right: 0px;width: 20%;height: 50%;; background-color:whitesmoke; border: 2px solid burlywood; padding: 5px 10px;">&nbsp;</div>
 <a href='http://www.gsi.go.jp/' target='_blank' style="z-index: 2;position: absolute;bottom: 1%;left: 1%;">国土地理院</a>
 <script>
     var style7 = new ol.style.Style({
         fill: new ol.style.Fill({
             color: 'rgba(180, 0, 104, 0.5)'
+        }),
+        image: new ol.style.Icon({
+            scale: 1,
+            anchor: [0.5, 1],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'fraction',
+            opacity: 0.85,
+            src: "http://h-crisis.niph.go.jp/assistant/wp-content/uploads/sites/4/2016/05/7.png"
         })
     });
     var style6S = new ol.style.Style({
         fill: new ol.style.Fill({
             color: 'rgba(165, 0, 33, 0.5)'
+        }),
+        image: new ol.style.Icon({
+            scale: 1,
+            anchor: [0.5, 1],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'fraction',
+            opacity: 0.85,
+            src: "http://h-crisis.niph.go.jp/assistant/wp-content/uploads/sites/4/2016/05/6s.png"
         })
     });
     var style6W = new ol.style.Style({
         fill: new ol.style.Fill({
             color: 'rgba(255, 40, 0, 0.5)'
+        }),
+        image: new ol.style.Icon({
+            scale: 1,
+            anchor: [0.5, 1],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'fraction',
+            opacity: 0.85,
+            src: "http://h-crisis.niph.go.jp/assistant/wp-content/uploads/sites/4/2016/05/6-.png"
         })
     });
     var style5S = new ol.style.Style({
         fill: new ol.style.Fill({
             color: 'rgba(255, 153, 0, 0.5)'
+        }),
+        image: new ol.style.Icon({
+            scale: 1,
+            anchor: [0.5, 1],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'fraction',
+            opacity: 0.85,
+            src: "http://h-crisis.niph.go.jp/assistant/wp-content/uploads/sites/4/2016/05/5s.png"
         })
     });
     var style5W = new ol.style.Style({
         fill: new ol.style.Fill({
             color: 'rgba(255, 230, 0, 0.5)'
+        }),
+        image: new ol.style.Icon({
+            scale: 1,
+            anchor: [0.5, 1],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'fraction',
+            opacity: 0.85,
+            src: "http://h-crisis.niph.go.jp/assistant/wp-content/uploads/sites/4/2016/05/5-.png"
         })
     });
     var style4 = new ol.style.Style({
         fill: new ol.style.Fill({
             color: 'rgba(255, 230, 150, 0.5)'
+        }),
+        image: new ol.style.Icon({
+            scale: 1,
+            anchor: [0.5, 1],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'fraction',
+            opacity: 0.85,
+            src: "http://h-crisis.niph.go.jp/assistant/wp-content/uploads/sites/4/2016/05/4.png"
         })
     });
     var style3 = new ol.style.Style({
         fill: new ol.style.Fill({
             color: 'rgba(0, 65, 255, 0.5)'
+        }),
+        image: new ol.style.Icon({
+            scale: 1,
+            anchor: [0.5, 1],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'fraction',
+            opacity: 0.85,
+            src: "http://h-crisis.niph.go.jp/assistant/wp-content/uploads/sites/4/2016/05/3.png"
         })
     });
     var style2 = new ol.style.Style({
         fill: new ol.style.Fill({
             color: 'rgba(0, 170, 255, 0.5)'
+        }),
+        image: new ol.style.Icon({
+            scale: 1,
+            anchor: [0.5, 1],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'fraction',
+            opacity: 0.85,
+            src: "http://h-crisis.niph.go.jp/assistant/wp-content/uploads/sites/4/2016/05/2.png"
         })
     });
     var style1 = new ol.style.Style({
         fill: new ol.style.Fill({
             color: 'rgba(242, 242, 255, 0.5)'
+        }),
+        image: new ol.style.Icon({
+            scale: 1,
+            anchor: [0.5, 1],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'fraction',
+            opacity: 0.85,
+            src: "http://h-crisis.niph.go.jp/assistant/wp-content/uploads/sites/4/2016/05/1.png"
         })
     });
     var styleHinan = new ol.style.Style({
@@ -102,7 +177,7 @@
     });
     var distribLayer = new ol.layer.Vector({
         source: new ol.source.Vector({
-            url: 'http://h-crisis.niph.go.jp/assistant/wp-content/uploads/sites/4/2016/05/Fukushima_0521.geojson',
+            url: 'http://h-crisis.niph.go.jp/assistant/wp-content/uploads/sites/4/2016/05/ShindoDistOnOffice.geojson',
             format: new ol.format.GeoJSON()
         }),
         style: function(feature, resolution) {
@@ -141,17 +216,36 @@
             minZoom: 10
         })
     });
-    var hinanLayer = new ol.layer.Vector({
+    var hinanLayer1 = new ol.layer.Vector({
         source: new ol.source.Vector({
-            url: 'http://h-crisis.niph.go.jp/assistant/wp-content/uploads/sites/4/2016/05/Hinanjo.geojson',
+            url: 'http://h-crisis.niph.go.jp/assistant/wp-content/uploads/sites/4/2016/05/HinanDay1.geojson',
             format: new ol.format.GeoJSON()
         }),
         style: function(feature, resolution) {
-                styleHinan.getText().setText(resolution < 10 ? feature.get('名称') + "(避難者数"　+ feature.get('避難者数') + "人)": '');
-                return styleHinan;
+            styleHinan.getText().setText(resolution < 10 ? feature.get('名称') + "(避難者数"　+ feature.get('避難者数') + "人)": '');
+            return styleHinan;
         }
-        });
-    map.addLayer(hinanLayer);
+    });
+    var hinanLayer4 = new ol.layer.Vector({
+        source: new ol.source.Vector({
+            url: 'http://h-crisis.niph.go.jp/assistant/wp-content/uploads/sites/4/2016/05/HinanDay4.geojson',
+            format: new ol.format.GeoJSON()
+        }),
+        style: function(feature, resolution) {
+            styleHinan.getText().setText(resolution < 10 ? feature.get('名称') + "(避難者数"　+ feature.get('避難者数') + "人)": '');
+            return styleHinan;
+        }
+    });
+    var hinanLayer14 = new ol.layer.Vector({
+        source: new ol.source.Vector({
+            url: 'http://h-crisis.niph.go.jp/assistant/wp-content/uploads/sites/4/2016/05/HinanDay14.geojson',
+            format: new ol.format.GeoJSON()
+        }),
+        style: function(feature, resolution) {
+            styleHinan.getText().setText(resolution < 10 ? feature.get('名称') + "(避難者数"　+ feature.get('避難者数') + "人)": '');
+            return styleHinan;
+        }
+    });
     var officeLayer = new ol.layer.Vector({
         source: new ol.source.Vector({
             url: 'http://h-crisis.niph.go.jp/assistant/wp-content/uploads/sites/4/2016/05/Office.geojson',
@@ -187,19 +281,109 @@
     };
     map.addLayer(distribLayer);
     distribLayer.setVisible(false);
-    var hinanOnOff   = document.getElementById('hinan-vis');
-    hinanOnOff.addEventListener('click', hinanButton);
-    function hinanButton() {
-        if (hinanLayer.getVisible()) {
-            hinanLayer.setVisible(false);
-            this.style.backgroundColor = "whitesmoke";
-        } else {
-            hinanLayer.setVisible(true);
+    var hinanOnOff1   = document.getElementById('hinan1-vis');
+    var hinanOnOff4   = document.getElementById('hinan4-vis');
+    var hinanOnOff14   = document.getElementById('hinan14-vis');
+    hinanOnOff1.addEventListener('click', hinanButton1);
+    var chs1 = 0;
+    var day = 0;
+    function hinanButton1() {
+        if (chs1%2 == 0) {
+            day = 1;
+            hinanLayer1.setVisible(true);
+            hinanLayer4.setVisible(false);
+            hinanLayer14.setVisible(false);
             this.style.backgroundColor = "green";
+            hinanOnOff4.style.backgroundColor = "whitesmoke";
+            hinanOnOff14.style.backgroundColor = "whitesmoke";
+            map.addLayer(hinanLayer1);
+            map.removeLayer(hinanLayer4);
+            map.removeLayer(hinanLayer14);
+            chs1++;
+            if(chs4!==0){
+                chs4++;}
+            if(chs14!==0){
+                chs14++;}
+        } else {
+            hinanLayer1.setVisible(false);
+            hinanLayer4.setVisible(false);
+            hinanLayer14.setVisible(false);
+            this.style.backgroundColor = "whitesmoke";
+            map.removeLayer(hinanLayer1);
+            map.removeLayer(hinanLayer4);
+            map.removeLayer(hinanLayer14);
+            chs1++;
         }
     };
-    map.addLayer(hinanLayer);
-    hinanLayer.setVisible(false);
+    map.addLayer(hinanLayer1);
+    hinanLayer1.setVisible(false);
+
+    hinanOnOff4.addEventListener('click', hinanButton4);
+    var chs4 = 0;
+    function hinanButton4() {
+        if (chs4%2 == 0) {
+            day = 4;
+            hinanLayer1.setVisible(false);
+            hinanLayer4.setVisible(true);
+            hinanLayer14.setVisible(false);
+            this.style.backgroundColor = "green";
+            hinanOnOff1.style.backgroundColor = "whitesmoke";
+            hinanOnOff14.style.backgroundColor = "whitesmoke";
+            map.removeLayer(hinanLayer1);
+            map.addLayer(hinanLayer4);
+            map.removeLayer(hinanLayer14);
+            if(chs1!==0){
+                chs1++;}
+            chs4++;
+            if(chs14!==0){
+                chs14++;}
+        } else {
+            hinanLayer1.setVisible(false);
+            hinanLayer4.setVisible(false);
+            hinanLayer14.setVisible(false);
+            this.style.backgroundColor = "whitesmoke";
+            map.removeLayer(hinanLayer1);
+            map.removeLayer(hinanLayer4);
+            map.removeLayer(hinanLayer14);
+            chs4++;
+        }
+    };
+    map.addLayer(hinanLayer4);
+    hinanLayer4.setVisible(false);
+
+    hinanOnOff14.addEventListener('click', hinanButton14);
+    var chs14 = 0;
+
+    function hinanButton14() {
+        if (chs14%2 == 0) {
+            day = 14;
+            hinanLayer1.setVisible(false);
+            hinanLayer4.setVisible(false);
+            hinanLayer14.setVisible(true);
+            this.style.backgroundColor = "green";
+            hinanOnOff1.style.backgroundColor = "whitesmoke";
+            hinanOnOff4.style.backgroundColor = "whitesmoke";
+            map.removeLayer(hinanLayer1);
+            map.removeLayer(hinanLayer4);
+            map.addLayer(hinanLayer14);
+            if(chs1!==0){
+                chs1++;}
+            if(chs4!==0){
+                chs4++;}
+            chs14++;
+        } else {
+            hinanLayer1.setVisible(false);
+            hinanLayer4.setVisible(false);
+            hinanLayer14.setVisible(false);
+            this.style.backgroundColor = "white";
+            map.removeLayer(hinanLayer1);
+            map.removeLayer(hinanLayer4);
+            map.removeLayer(hinanLayer14);
+            chs14++;
+        }
+    };
+    map.addLayer(hinanLayer14);
+    hinanLayer14.setVisible(false);
     var officeOnOff   = document.getElementById('office-vis');
     officeOnOff.addEventListener('click', officeButton);
     function officeButton() {
@@ -250,6 +434,7 @@
         var labelH = '';
         var labelI = '';
         var labelJ = '';
+        var labelHinan = new Array(80);
         map.forEachFeatureAtPixel(pixel, function(feature){
             labelB = feature.get('名称');
             labelC = feature.get('住所');
@@ -260,8 +445,53 @@
             labelH = feature.get('住所');
             labelI = feature.get('電話番号');
             labelJ = feature.get('二次医療圏');
+            labelHinan[0] = feature.get('男');
+            labelHinan[1] = feature.get('女');
+            labelHinan[2] = feature.get('高齢者');
+            labelHinan[3] = feature.get('身体障害者');
+            labelHinan[4] = feature.get('乳幼児');
+            labelHinan[5] = feature.get('妊婦');
+            labelHinan[6] = feature.get('自立歩行不');
+            labelHinan[7] = feature.get('その他の要');
+            labelHinan[8] = feature.get('人工透析');
+            labelHinan[9] = feature.get('人工呼吸器');
+            labelHinan[10] = feature.get('電気');
+            labelHinan[11] = feature.get('水');
+            labelHinan[12] = feature.get('ガス');
+            labelHinan[13] = feature.get('通信');
+            labelHinan[20] = feature.get('換気');
+            labelHinan[21] = feature.get('暖房');
+            labelHinan[22] = feature.get('トイレ');
+            labelHinan[23] = feature.get('汚物');
+            labelHinan[24] = feature.get('ゴミ');
+            labelHinan[25] = feature.get('食品');
+            labelHinan[26] = feature.get('衛生');
+            labelHinan[30] = feature.get('飲料水');
+            labelHinan[31] = feature.get('食事');
+            labelHinan[40] = feature.get('有無と方法');
+            labelHinan[41] = feature.get('医師');
+            labelHinan[42] = feature.get('看護師');
+            labelHinan[43] = feature.get('薬剤師');
+            labelHinan[44] = feature.get('事務');
+            labelHinan[50] = feature.get('総数');
+            labelHinan[51] = feature.get('インフルエ');
+            labelHinan[52] = feature.get('呼吸器疾患');
+            labelHinan[53] = feature.get('呼吸困難');
+            labelHinan[54] = feature.get('発熱');
+            labelHinan[55] = feature.get('下痢');
+            labelHinan[56] = feature.get('嘔気・嘔吐');
+            labelHinan[57] = feature.get('発疹');
+            labelHinan[58] = feature.get('不眠・不安');
+            labelHinan[59] = feature.get('精神科疾患');
+            labelHinan[60] = feature.get('病院搬送・');
+            labelHinan[70] = feature.get('高血圧');
+            labelHinan[71] = feature.get('糖尿病');
+            labelHinan[72] = feature.get('潰瘍性大腸');
+            labelHinan[73] = feature.get('パーキンソ');
+            labelHinan[80] = feature.get('備考');
         });
         info.innerHTML="";
+        console.log(labelHinan[8])
         if(typeof labelB === "undefined" && typeof labelE === "undefined" && labelG === "undefined") {
             overlayHinan.setPosition();
             map.addOverlay(overlayHinan);
@@ -274,7 +504,8 @@
                     "住所    :" + labelF;
             info.innerHTML =
                     "名称    :" + labelE + '<br>' +
-                    "住所    :" + labelF;
+                    "住所    :" + labelF + '<br>' +
+                    '<a href="http://www.niph.go.jp" target="_blank">NIPH</a>';;
             overlayHinan.setPosition(coordinate);
             map.addOverlay(overlayHinan);
         }
@@ -291,10 +522,11 @@
                     "名称    :" + labelG + '<br>' +
                     "住所    :" + labelH + '<br>' +
                     "電話番号        :" + labelI + '<br>' +
-                    "二次医療圏    :" + labelJ;
+                    "二次医療圏    :" + labelJ + '<br>' +
+                    '<a href="http://www.niph.go.jp" target="_blank">NIPH</a>';;
             overlayHinan.setPosition(coordinate);
             map.addOverlay(overlayHinan);
-        } else if (labelB.length > 0) {
+        } else if (day == 1 || day == 4) {
             overlayHinan.setPosition();
             map.addOverlay(overlayHinan);
             var element = overlayHinan.getElement();
@@ -303,9 +535,47 @@
                     "住所    :" + labelC + '<br>' +
                     "避難者数 :" + labelD + "人";
             info.innerHTML =
+                    "避難者数 :" + labelD + "人" + '<br>' +
+                    "男性    :" + labelHinan[0] + "人" + '<br>' +
+                    "女性    :" + labelHinan[1] + "人" + '<br>' +
+                    "高齢者    :" + labelHinan[2] + "人" + '<br>' +
+                    "身体障害者    :" + labelHinan[3] + "人" + '<br>' +
+                    "乳幼児    :" + labelHinan[4] + "人" + '<br>' +
+                    "妊婦    :" + labelHinan[5] + "人" + '<br>' +
+                    "自立歩行不    :" + labelHinan[6] + "人" + '<br>' +
+                    "その他の要    :" + labelHinan[7] + "人" + '<br>' +
+                    "電気    :" + labelHinan[10] + '<br>' +
+                    "水    :" + labelHinan[11] + '<br>' +
+                    "ガス    :" + labelHinan[12] + '<br>' +
+                    "通信    :" + labelHinan[13] + '<br>' +
+                    '<a href="http://www.niph.go.jp" target="_blank">NIPH</a>';;
+            overlayHinan.setPosition(coordinate);
+            map.addOverlay(overlayHinan);
+        } else if (day == 14) {
+            overlayHinan.setPosition();
+            map.addOverlay(overlayHinan);
+            var element = overlayHinan.getElement();
+            element.innerHTML =
                     "名称    :" + labelB + '<br>' +
                     "住所    :" + labelC + '<br>' +
                     "避難者数 :" + labelD + "人";
+            info.innerHTML =
+                    "避難者数 :" + labelD + "人" + '<br>' +
+                    "男性    :" + labelHinan[0] + "人" + '<br>' +
+                    "女性    :" + labelHinan[1] + "人" + '<br>' +
+                    "高齢者    :" + labelHinan[2] + "人" + '<br>' +
+                    "身体障害者    :" + labelHinan[3] + "人" + '<br>' +
+                    "乳幼児    :" + labelHinan[4] + "人" + '<br>' +
+                    "妊婦    :" + labelHinan[5] + "人" + '<br>' +
+                    "自立歩行不    :" + labelHinan[6] + "人" + '<br>' +
+                    "その他の要    :" + labelHinan[7] + "人" + '<br>' +
+                    "人工透析    :" + labelHinan[8] + "人" + '<br>' +
+                    "人工呼吸器    :" + labelHinan[9] + "人" + '<br>' +
+                    "電気    :" + labelHinan[10] + '<br>' +
+                    "水    :" + labelHinan[11] + '<br>' +
+                    "ガス    :" + labelHinan[12] + '<br>' +
+                    "通信    :" + labelHinan[13] + '<br>' +
+                    '<a href="http://www.niph.go.jp" target="_blank">NIPH</a>';;
             overlayHinan.setPosition(coordinate);
             map.addOverlay(overlayHinan);
         } else {
