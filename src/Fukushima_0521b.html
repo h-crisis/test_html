@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fukushima0521</title>
+    <link rel="stylesheet" href="http://openlayers.org/en/v3.15.0/css/ol.css" type="text/css">
+    <script src="http://openlayers.org/en/v3.15.0/build/ol.js"></script>
+</head>
+<body>
+<div id="map" class="map" style="z-index: 1;position: absolute;top: 0px;left: 0px;width: 100%;height: 100%;"></div>
+<div id="overlayHinan" style="background-color:whitesmoke; border: 1px solid black; padding: 5px 10px;"></div>
+<button id="distribution-vis" style="z-index: 3;position: absolute; bottom: 30%;left: 0px;width: 5%;height: 5%;">震度分布 ON/OFF</button>
+<button id="hospital-vis" style="z-index: 3;position: absolute; bottom: 25%;left: 0px;width: 5%;height: 5%;" >病院 ON/OFF</button>
+<button id="office-vis" style="z-index: 3;position: absolute; bottom: 20%;left: 0px;width: 5%;height: 5%;">役所 ON/OFF</button>
+<button id="hinan-vis" style="z-index: 3;position: absolute; bottom: 13%;left: 0px;width: 5%;height: 7%;">避難所 Day1/Day4 /Day14/OFF</button>
+<div id="info" style="z-index: 2;position: absolute;top: 0px;right: 0px;width: 20%;height: 20%;; background-color:whitesmoke; border: 2px solid burlywood; padding: 5px 10px;">&nbsp;</div>
+<a href='http://www.gsi.go.jp/' target='_blank' style="z-index: 2;position: absolute;bottom: 1%;left: 1%;">国土地理院</a>
+<script>
+    var style7 = new ol.style.Style({
+        fill: new ol.style.Fill({
+            color: 'rgba(180, 0, 104, 0.5)'
+        })
+    });
+    var style6S = new ol.style.Style({
+        fill: new ol.style.Fill({
+            color: 'rgba(165, 0, 33, 0.5)'
+        })
+    });
+    var style6W = new ol.style.Style({
+        fill: new ol.style.Fill({
+            color: 'rgba(255, 40, 0, 0.5)'
+        })
+    });
+    var style5S = new ol.style.Style({
+        fill: new ol.style.Fill({
+            color: 'rgba(255, 153, 0, 0.5)'
+        })
+    });
+    var style5W = new ol.style.Style({
+        fill: new ol.style.Fill({
+            color: 'rgba(255, 230, 0, 0.5)'
+        })
+    });
+    var style4 = new ol.style.Style({
+        fill: new ol.style.Fill({
+            color: 'rgba(255, 230, 150, 0.5)'
+        })
+    });
+    var style3 = new ol.style.Style({
+        fill: new ol.style.Fill({
+            color: 'rgba(0, 65, 255, 0.5)'
+        })
+    });
+    var style2 = new ol.style.Style({
+        fill: new ol.style.Fill({
+            color: 'rgba(0, 170, 255, 0.5)'
+        })
+    });
+    var style1 = new ol.style.Style({
+        fill: new ol.style.Fill({
+            color: 'rgba(242, 242, 255, 0.5)'
+        })
+    });
+    var styleHinan = new ol.style.Style({
+        text: new ol.style.Text({
+            font: '12px Calibri,sans-serif'
+        }),
+        image: new ol.style.Icon({
+            scale: 0.05,
+            anchor: [0.5, 1],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'fraction',
+            opacity: 0.85,
+            src: "http://h-crisis.niph.go.jp/assistant/wp-content/uploads/sites/4/2016/04/shelter_green.png"
+        })
+    });
+    var styleOffice = new ol.style.Style({
+        text: new ol.style.Text({
+            font: '12px Calibri,sans-serif'
+        }),
+        image: new ol.style.Icon({
+            scale: 0.04,
+            anchor: [0.5, 1],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'fraction',
+            opacity: 0.85,
+            src: "http://h-crisis.niph.go.jp/assistant/wp-content/uploads/sites/4/2016/05/Office.png"
+        })
+    });
+    var styleHosp = new ol.style.Style({
+        text: new ol.style.Text({
+            font: '12px Calibri,sans-serif'
+        }),
+        image: new ol.style.Icon({
+            scale: 0.2,
+            anchor: [0.5, 1],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'fraction',
+            opacity: 0.85,
+            src: "http://h-crisis.niph.go.jp/assistant/wp-content/uploads/sites/4/2016/04/Hospital.png"
+        })
+    });
+    var distribLayer = new ol.layer.Vector({
+        source: new ol.source.Vector({
+            url: 'http://h-crisis.niph.go.jp/assistant/wp-content/uploads/sites/4/2016/05/Fukushima_0521.geojson',
+            format: new ol.format.GeoJSON()
+        }),
+        style: function(feature, resolution) {
+            if(feature.get('SI')>=6.5) {
+                return style7;
+            } else if(feature.get('SI')>=6) {
+                return style6S;
+            } else if(feature.get('SI')>=5.5) {
+                return style6W;
+            } else if(feature.get('SI')>=5) {
+                return style5S;
+            } else if(feature.get('SI')>=4.5) {
+                return style5W;
+            } else if(feature.get('SI')>=3.5) {
+                return style4;
+            } else if(feature.get('SI')>=2.5) {
+                return style3;
+            } else if(feature.get('SI')>=1.5) {
+                return style2;
+            } else if(feature.get('SI')>0) {
+                return style1;
+            } else {}
+        }
+    });
+    var map = new ol.Map({
+        layers: [ new ol.layer.Tile({source:
+                new ol.source.XYZ({
+                    url : 'http://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
+                    attribution  : "<a href='http://www.gsi.go.jp/kikakuchousei/kikakuchousei40182.html' target='_blank'>国土地理院</a>"
+                })})
+        ],
+        target: 'map',
+        view: new ol.View({
+            center: ol.proj.transform([140.461129, 37.787558,13], 'EPSG:4326', 'EPSG:3857'),
+            zoom: 12,
+            minZoom: 10
+        })
+    });
+    var hinanLayer = new ol.layer.Vector({
+        source: new ol.source.Vector({
+            url: 'http://h-crisis.niph.go.jp/assistant/wp-content/uploads/sites/4/2016/05/Hinanjo.geojson',
+            format: new ol.format.GeoJSON()
+        }),
+        style: function(feature, resolution) {
+                styleHinan.getText().setText(resolution < 10 ? feature.get('名称') + "(避難者数"　+ feature.get('避難者数') + "人)": '');
+                return styleHinan;
+        }
+        });
+    map.addLayer(hinanLayer);
+    var officeLayer = new ol.layer.Vector({
+        source: new ol.source.Vector({
+            url: 'http://h-crisis.niph.go.jp/assistant/wp-content/uploads/sites/4/2016/05/Office.geojson',
+            format: new ol.format.GeoJSON()
+        }),
+        style: function(feature, resolution) {
+            styleOffice.getText().setText(resolution < 10 ? feature.get('P34_003') : '');
+            return styleOffice;
+        }
+    });
+    map.addLayer(officeLayer);
+    var hospLayer = new ol.layer.Vector({
+        source: new ol.source.Vector({
+            url: 'http://h-crisis.niph.go.jp/assistant/wp-content/uploads/sites/4/2016/05/Hospital.geojson',
+            format: new ol.format.GeoJSON()
+        }),
+        style: function(feature, resolution) {
+            styleHosp.getText().setText(resolution < 10 ? feature.get('医療機関名') : '');
+            return styleHosp;
+        }
+    });
+    map.addLayer(hospLayer);
+    var distribOnOff   = document.getElementById('distribution-vis');
+    distribOnOff.addEventListener('click', distribButton);
+    function distribButton() {
+        if (distribLayer.getVisible()) {
+            distribLayer.setVisible(false);
+            this.style.backgroundColor = "whitesmoke";
+        } else {
+            distribLayer.setVisible(true);
+            this.style.backgroundColor = "orange";
+        }
+    };
+    map.addLayer(distribLayer);
+    distribLayer.setVisible(false);
+    var hinanOnOff   = document.getElementById('hinan-vis');
+    hinanOnOff.addEventListener('click', hinanButton);
+    function hinanButton() {
+        if (hinanLayer.getVisible()) {
+            hinanLayer.setVisible(false);
+            this.style.backgroundColor = "whitesmoke";
+        } else {
+            hinanLayer.setVisible(true);
+            this.style.backgroundColor = "green";
+        }
+    };
+    map.addLayer(hinanLayer);
+    hinanLayer.setVisible(false);
+    var officeOnOff   = document.getElementById('office-vis');
+    officeOnOff.addEventListener('click', officeButton);
+    function officeButton() {
+        if (officeLayer.getVisible()) {
+            officeLayer.setVisible(false);
+            this.style.backgroundColor = "whitesmoke";
+            this.style.color = "black";
+        } else {
+            officeLayer.setVisible(true);
+            this.style.backgroundColor = "black";
+            this.style.color = "whitesmoke";
+        }
+    };
+    map.addLayer(officeLayer);
+    officeLayer.setVisible(false);
+    var hospOnOff   = document.getElementById('hospital-vis');
+    hospOnOff.addEventListener('click', hospButton);
+    function hospButton() {
+        if (hospLayer.getVisible()) {
+            hospLayer.setVisible(false);
+            this.style.backgroundColor = "whitesmoke";
+        } else {
+            hospLayer.setVisible(true);
+            this.style.backgroundColor = "red";
+        }
+    };
+    map.addLayer(hospLayer);
+    hospLayer.setVisible(false);
+    var overlayHinan = new ol.Overlay({
+        element: document.getElementById('overlayHinan'),
+        positioning: 'top-left'
+    });
+
+    var displayFeatureInfo = function(pixel) {
+        var feature = map.forEachFeatureAtPixel(pixel, function(feature) {
+        })};
+    map.on('click', function(evt) {
+        displayFeatureInfo(evt.pixel);
+        var coordinate = evt.coordinate;
+        var pixel = map.getPixelFromCoordinate(coordinate);
+        var info = document.getElementById('info');
+        var labelB = '';
+        var labelC = '';
+        var labelD = '';
+        var labelE = '';
+        var labelF = '';
+        var labelG = '';
+        var labelH = '';
+        var labelI = '';
+        var labelJ = '';
+        map.forEachFeatureAtPixel(pixel, function(feature){
+            labelB = feature.get('名称');
+            labelC = feature.get('住所');
+            labelD = feature.get('避難者数');
+            labelE = feature.get('P34_003');
+            labelF = feature.get('P34_004');
+            labelG = feature.get('医療機関名');
+            labelH = feature.get('住所');
+            labelI = feature.get('電話番号');
+            labelJ = feature.get('二次医療圏');
+        });
+        info.innerHTML="";
+        if(typeof labelB === "undefined" && typeof labelE === "undefined" && labelG === "undefined") {
+            overlayHinan.setPosition();
+            map.addOverlay(overlayHinan);
+        } else if(typeof labelB === "undefined" && typeof labelG === "undefined") {
+            overlayHinan.setPosition();
+            map.addOverlay(overlayHinan);
+            var element = overlayHinan.getElement();
+            element.innerHTML =
+                    "名称    :" + labelE + '<br>' +
+                    "住所    :" + labelF;
+            info.innerHTML =
+                    "名称    :" + labelE + '<br>' +
+                    "住所    :" + labelF;
+            overlayHinan.setPosition(coordinate);
+            map.addOverlay(overlayHinan);
+        }
+        else if (typeof labelE === "undefined" && typeof labelB === "undefined") {
+            overlayHinan.setPosition();
+            map.addOverlay(overlayHinan);
+            var element = overlayHinan.getElement();
+            element.innerHTML =
+                    "名称    :" + labelG + '<br>' +
+                    "住所    :" + labelH + '<br>' +
+                    "電話番号        :" + labelI + '<br>' +
+                    "二次医療圏    :" + labelJ;
+            info.innerHTML =
+                    "名称    :" + labelG + '<br>' +
+                    "住所    :" + labelH + '<br>' +
+                    "電話番号        :" + labelI + '<br>' +
+                    "二次医療圏    :" + labelJ;
+            overlayHinan.setPosition(coordinate);
+            map.addOverlay(overlayHinan);
+        } else if (labelB.length > 0) {
+            overlayHinan.setPosition();
+            map.addOverlay(overlayHinan);
+            var element = overlayHinan.getElement();
+            element.innerHTML =
+                    "名称    :" + labelB + '<br>' +
+                    "住所    :" + labelC + '<br>' +
+                    "避難者数 :" + labelD + "人";
+            info.innerHTML =
+                    "名称    :" + labelB + '<br>' +
+                    "住所    :" + labelC + '<br>' +
+                    "避難者数 :" + labelD + "人";
+            overlayHinan.setPosition(coordinate);
+            map.addOverlay(overlayHinan);
+        } else {
+            overlayHinan.setPosition();
+            map.addOverlay(overlayHinan);
+        }
+    });
+</script>
+</body>
+</html>
