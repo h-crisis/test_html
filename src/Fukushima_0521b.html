@@ -25,12 +25,12 @@
             color: 'rgba(180, 0, 104, 0.5)'
         }),
         image: new ol.style.Icon({
-            scale: 1,
+            scale: 1.5,
             anchor: [0.5, 1],
             anchorXUnits: 'fraction',
             anchorYUnits: 'fraction',
             opacity: 0.85,
-            src: "http://h-crisis.niph.go.jp/assistant/wp-content/uploads/sites/4/2016/05/7.png"
+            src: "7.png"
         })
     });
     var style6S = new ol.style.Style({
@@ -38,12 +38,12 @@
             color: 'rgba(165, 0, 33, 0.5)'
         }),
         image: new ol.style.Icon({
-            scale: 1,
+            scale: 1.5,
             anchor: [0.5, 1],
             anchorXUnits: 'fraction',
             anchorYUnits: 'fraction',
             opacity: 0.85,
-            src: "http://h-crisis.niph.go.jp/assistant/wp-content/uploads/sites/4/2016/05/6s.png"
+            src: "6s.png"
         })
     });
     var style6W = new ol.style.Style({
@@ -51,12 +51,12 @@
             color: 'rgba(255, 40, 0, 0.5)'
         }),
         image: new ol.style.Icon({
-            scale: 1,
+            scale: 1.5,
             anchor: [0.5, 1],
             anchorXUnits: 'fraction',
             anchorYUnits: 'fraction',
             opacity: 0.85,
-            src: "http://h-crisis.niph.go.jp/assistant/wp-content/uploads/sites/4/2016/05/6-.png"
+            src: "6-.png"
         })
     });
     var style5S = new ol.style.Style({
@@ -64,12 +64,12 @@
             color: 'rgba(255, 153, 0, 0.5)'
         }),
         image: new ol.style.Icon({
-            scale: 1,
+            scale: 1.5,
             anchor: [0.5, 1],
             anchorXUnits: 'fraction',
             anchorYUnits: 'fraction',
             opacity: 0.85,
-            src: "http://h-crisis.niph.go.jp/assistant/wp-content/uploads/sites/4/2016/05/5s.png"
+            src: "5s.png"
         })
     });
     var style5W = new ol.style.Style({
@@ -77,12 +77,12 @@
             color: 'rgba(255, 230, 0, 0.5)'
         }),
         image: new ol.style.Icon({
-            scale: 1,
+            scale: 1.5,
             anchor: [0.5, 1],
             anchorXUnits: 'fraction',
             anchorYUnits: 'fraction',
             opacity: 0.85,
-            src: "http://h-crisis.niph.go.jp/assistant/wp-content/uploads/sites/4/2016/05/5-.png"
+            src: "5-.png"
         })
     });
     var style4 = new ol.style.Style({
@@ -90,12 +90,12 @@
             color: 'rgba(255, 230, 150, 0.5)'
         }),
         image: new ol.style.Icon({
-            scale: 1,
+            scale: 1.5,
             anchor: [0.5, 1],
             anchorXUnits: 'fraction',
             anchorYUnits: 'fraction',
             opacity: 0.85,
-            src: "http://h-crisis.niph.go.jp/assistant/wp-content/uploads/sites/4/2016/05/4.png"
+            src: "4.png"
         })
     });
     var style3 = new ol.style.Style({
@@ -103,12 +103,12 @@
             color: 'rgba(0, 65, 255, 0.5)'
         }),
         image: new ol.style.Icon({
-            scale: 1,
+            scale: 1.5,
             anchor: [0.5, 1],
             anchorXUnits: 'fraction',
             anchorYUnits: 'fraction',
             opacity: 0.85,
-            src: "http://h-crisis.niph.go.jp/assistant/wp-content/uploads/sites/4/2016/05/3.png"
+            src: "3.png"
         })
     });
     var style2 = new ol.style.Style({
@@ -116,12 +116,12 @@
             color: 'rgba(0, 170, 255, 0.5)'
         }),
         image: new ol.style.Icon({
-            scale: 1,
+            scale: 1.5,
             anchor: [0.5, 1],
             anchorXUnits: 'fraction',
             anchorYUnits: 'fraction',
             opacity: 0.85,
-            src: "http://h-crisis.niph.go.jp/assistant/wp-content/uploads/sites/4/2016/05/2.png"
+            src: "2.png"
         })
     });
     var style1 = new ol.style.Style({
@@ -129,12 +129,12 @@
             color: 'rgba(242, 242, 255, 0.5)'
         }),
         image: new ol.style.Icon({
-            scale: 1,
+            scale: 1.5,
             anchor: [0.5, 1],
             anchorXUnits: 'fraction',
             anchorYUnits: 'fraction',
             opacity: 0.85,
-            src: "http://h-crisis.niph.go.jp/assistant/wp-content/uploads/sites/4/2016/05/1.png"
+            src: "1.png"
         })
     });
     var styleHinan = new ol.style.Style({
@@ -203,23 +203,27 @@
             } else {}
         }
     });
+
     var additionalmapOsm = new ol.source.MapQuest({ layer: 'osm' });
     var osmQuestLayer = new ol.layer.Tile({
         source: additionalmapOsm,
-        opacity: 0
+        opacity: 1
     });
     var additionalmapSat = new ol.source.MapQuest({ layer: 'sat' });
     var satQuestLayer = new ol.layer.Tile({
         source: additionalmapSat,
-        opacity: 0
+        opacity: 1
+    });
+    var basemap = new ol.source.XYZ({
+        url : 'http://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
+        attribution  : "<a href='http://www.gsi.go.jp/kikakuchousei/kikakuchousei40182.html' target='_blank'>国土地理院</a>"
+    });
+    var baseLayer = new ol.layer.Tile({
+        source: basemap,
+        opacity: 1
     });
     var map = new ol.Map({
-        layers: [ new ol.layer.Tile({source:
-                new ol.source.XYZ({
-                    url : 'http://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
-                    attribution  : "<a href='http://www.gsi.go.jp/kikakuchousei/kikakuchousei40182.html' target='_blank'>国土地理院</a>"
-                })}),
-            osmQuestLayer,satQuestLayer
+        layers: [ baseLayer,osmQuestLayer,satQuestLayer
         ],
         target: 'map',
         view: new ol.View({
@@ -231,22 +235,51 @@
     });
 
     var mapSwitch   = document.getElementById('map-vis');
+    osmQuestLayer.setVisible(false);
+    satQuestLayer.setVisible(false);
     mapSwitch.addEventListener('click', mapButton);
     var mapcount = 0;
     function mapButton() {
         if (mapcount%3==0) {
-            osmQuestLayer.setOpacity(1);
-            satQuestLayer.setOpacity(0);
+            osmQuestLayer.setVisible(true);
+            satQuestLayer.setVisible(false);
+            baseLayer.setVisible(false);
             this.style.backgroundColor = "#86B81B";
             mapcount++;
         } else if (mapcount%3==1) {
-            osmQuestLayer.setOpacity(0);
-            satQuestLayer.setOpacity(1);
+            osmQuestLayer.setVisible(false);
+            satQuestLayer.setVisible(true);
+            baseLayer.setVisible(false);
             this.style.backgroundColor = "blue";
             mapcount++;
         } else {
-            osmQuestLayer.setOpacity(0);
-            satQuestLayer.setOpacity(0);
+            osmQuestLayer.setVisible(false);
+            satQuestLayer.setVisible(false);
+            baseLayer.setVisible(true);
+            this.style.backgroundColor = "whitesmoke";
+            mapcount++;
+        }
+    };
+
+    var mapSwitch   = document.getElementById('map-vis');
+    osmQuestLayer.setVisible(false);
+    satQuestLayer.setVisible(false);
+    mapSwitch.addEventListener('click', mapButton);
+    var mapcount = 0;
+    function mapButton() {
+        if (mapcount%3==0) {
+            osmQuestLayer.setVisible(true);
+            satQuestLayer.setVisible(false);
+            this.style.backgroundColor = "#86B81B";
+            mapcount++;
+        } else if (mapcount%3==1) {
+            osmQuestLayer.setVisible(false);
+            satQuestLayer.setVisible(true);
+            this.style.backgroundColor = "blue";
+            mapcount++;
+        } else {
+            osmQuestLayer.setVisible(false);
+            satQuestLayer.setVisible(false);
             this.style.backgroundColor = "whitesmoke";
             mapcount++;
         }
