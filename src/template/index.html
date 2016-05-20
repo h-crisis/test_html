@@ -12,6 +12,7 @@
 <body>
 <div id="map" class="map" style="z-index: 1;position: absolute;top: 0px;left: 0px;width: 100%;height: 100%;"></div>
 <div id="overlayHinan" style="background-color:whitesmoke; border: 1px solid black; padding: 5px 10px;"></div>
+<div id="popOverLay" style="background-color:whitesmoke; border: 1px solid black; padding: 5px 10px;"></div>
 <button id="distribution-vis" style="z-index: 3;position: absolute; bottom: 35%;left: 0px;width: 5%;height: 5%;">震度分布 ON/OFF</button>
 <button id="hospital-vis" style="z-index: 3;position: absolute; bottom: 30%;left: 0px;width: 5%;height: 5%;" >病院 ON/OFF</button>
 <button id="office-vis" style="z-index: 3;position: absolute; bottom: 25%;left: 0px;width: 5%;height: 5%;">役所 ON/OFF</button>
@@ -157,7 +158,7 @@
             map.removeLayer(hinanLayer14);
             chs1++;
         }
-    };
+    }
     map.addLayer(hinanLayer1);
     hinanLayer1.setVisible(false);
 
@@ -190,7 +191,7 @@
             map.removeLayer(hinanLayer14);
             chs4++;
         }
-    };
+    }
     map.addLayer(hinanLayer4);
     hinanLayer4.setVisible(false);
 
@@ -224,7 +225,7 @@
             map.removeLayer(hinanLayer14);
             chs14++;
         }
-    };
+    }
     map.addLayer(hinanLayer14);
     hinanLayer14.setVisible(false);
     var officeOnOff   = document.getElementById('office-vis');
@@ -239,7 +240,7 @@
             this.style.backgroundColor = "black";
             this.style.color = "whitesmoke";
         }
-    };
+    }
     map.addLayer(officeLayer);
     officeLayer.setVisible(false);
     var hospOnOff   = document.getElementById('hospital-vis');
@@ -252,22 +253,59 @@
             hospLayer.setVisible(true);
             this.style.backgroundColor = "red";
         }
-    };
+    }
     map.addLayer(hospLayer);
     hospLayer.setVisible(false);
+
     var overlayHinan = new ol.Overlay({
         element: document.getElementById('overlayHinan'),
         positioning: 'top-left'
     });
 
-    var displayFeatureInfo = function(pixel) {
+    var popOverLay = new ol.Overlay({
+        element: document.getElementById('popOverLay'),
+        positioning: 'top-left'
+    });
+
+    map.addOverlay(popOverLay);
+
+    var displayFeatureInfo = function(pixel, coordinate) {
+        var features = []; // クリックされた複数のfeatureをストック
+        map.forEachFeatureAtPixel(pixel, function(feature){
+            features.push(feature);
+        });
+
+        if(features.length == 0) {
+            document.getElementById('info').style.diplay = 'none';
+            document.getElementById('info').innerHTML = '';
+            popOverLay.getElement().innerHTML = '';
+            popOverLay.getElement().style.display = 'none';
+        }
+        else {
+            var htmlPop = [];
+            for(i=0 ; i < features.length; i++) {
+                var featureId = features[i].getId().split('.');
+
+                if(featureId[0] === "si") { // 震度分布の処理
+                    popOverLay.getElement().innerHTML = features[i].get('P34_003') + "(" + features[i].get('P34_004') + ")<br>";
+                    document.getElementById('info').style.display = 'none';
+                }
+            }
+            popOverLay.setPosition(coordinate);
+            popOverLay.getElement().style.display = 'block';
+        }
+
+
+        console.log("features: "  + features.length);
         var feature = map.forEachFeatureAtPixel(pixel, function(feature) {
         })};
+
     map.on('click', function(evt) {
-        displayFeatureInfo(evt.pixel);
+        displayFeatureInfo(evt.pixel, evt.coordinate);
         var coordinate = evt.coordinate;
         var pixel = map.getPixelFromCoordinate(coordinate);
         var info = document.getElementById('info');
+        var element = popOverLay.getElement();
         var labelB = '';
         var labelC = '';
         var labelD = '';
@@ -276,11 +314,15 @@
         var labelG = '';
         var labelH = '';
         var labelI = '';
-        var labelJ = '';
+        var hHZjlabelJ = '';
         var labelHinan = new Array(80);
         var point;
+        console.log(coordinate + ":" + pixel);
         map.forEachFeatureAtPixel(pixel, function(feature){
-            console.log(feature.getId());
+
+
+
+
             point = feature;
             labelB = feature.get('名称');
             labelC = feature.get('住所');
@@ -337,7 +379,11 @@
             labelHinan[80] = feature.get('備考');
         });
         info.innerHTML="";
-        if(point === "undefined") {
+
+        if(true) {
+
+        }
+        else if(point === "undefined") {
             info.innerHTML ="";
         }
         else if(typeof labelB === "undefined" && typeof labelE === "undefined" && labelG === "undefined") {
@@ -353,7 +399,7 @@
             info.innerHTML =
                     "名称    :" + labelE + '<br>' +
                     "住所    :" + labelF + '<br>' +
-                    '<a href="http://www.niph.go.jp" target="_blank">NIPH</a>';;
+                    '<a href="http://www.niph.go.jp" target="_blank">NIPH</a>';
             overlayHinan.setPosition(coordinate);
             map.addOverlay(overlayHinan);
         }
@@ -371,7 +417,7 @@
                     "住所    :" + labelH + '<br>' +
                     "電話番号        :" + labelI + '<br>' +
                     "二次医療圏    :" + labelJ + '<br>' +
-                    '<a href="http://www.niph.go.jp" target="_blank">NIPH</a>';;
+                    '<a href="http://www.niph.go.jp" target="_blank">NIPH</a>';
             overlayHinan.setPosition(coordinate);
             map.addOverlay(overlayHinan);
         } else if (day == 1 || day == 4) {
@@ -396,7 +442,7 @@
                     "水    :" + labelHinan[11] + '<br>' +
                     "ガス    :" + labelHinan[12] + '<br>' +
                     "通信    :" + labelHinan[13] + '<br>' +
-                    '<a href="http://www.niph.go.jp" target="_blank">NIPH</a>';;
+                    '<a href="http://www.niph.go.jp" target="_blank">NIPH</a>';
             overlayHinan.setPosition(coordinate);
             map.addOverlay(overlayHinan);
         } else if (day == 14) {
@@ -423,7 +469,7 @@
                     "水    :" + labelHinan[11] + '<br>' +
                     "ガス    :" + labelHinan[12] + '<br>' +
                     "通信    :" + labelHinan[13] + '<br>' +
-                    '<a href="http://www.niph.go.jp" target="_blank">NIPH</a>';;
+                    '<a href="http://www.niph.go.jp" target="_blank">NIPH</a>';
             overlayHinan.setPosition(coordinate);
             map.addOverlay(overlayHinan);
         } else {
