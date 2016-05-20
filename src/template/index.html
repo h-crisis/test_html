@@ -278,7 +278,10 @@
         var labelI = '';
         var labelJ = '';
         var labelHinan = new Array(80);
+        var point;
         map.forEachFeatureAtPixel(pixel, function(feature){
+            console.log(feature.getId());
+            point = feature;
             labelB = feature.get('名称');
             labelC = feature.get('住所');
             labelD = feature.get('避難者数');
@@ -334,8 +337,10 @@
             labelHinan[80] = feature.get('備考');
         });
         info.innerHTML="";
-        console.log(labelHinan[8])
-        if(typeof labelB === "undefined" && typeof labelE === "undefined" && labelG === "undefined") {
+        if(point === "undefined") {
+            info.innerHTML ="";
+        }
+        else if(typeof labelB === "undefined" && typeof labelE === "undefined" && labelG === "undefined") {
             overlayHinan.setPosition();
             map.addOverlay(overlayHinan);
         } else if(typeof labelB === "undefined" && typeof labelG === "undefined") {
