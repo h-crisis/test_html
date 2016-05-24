@@ -2,7 +2,7 @@
  * Created by manabu on 2016/05/19.
  */
 
-var styleShelter = new ol.style.Style({
+var styleHinan = new ol.style.Style({
     text: new ol.style.Text({
         font: '12px Calibri,sans-serif'
     }),
