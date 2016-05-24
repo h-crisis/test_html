@@ -121,9 +121,12 @@ var styleSI1 = new ol.style.Style({
 });
 
 // 震度GeoJSONを読み込む
+// 本震のファイル名「si_h01.GeoJson」
+// 余震のファイル名「si_y01.GeoJson」
+// 余震発生毎に,si_y02.GeoJson,si_y03.GeoJson...とファイルが作成される
 var layerSI = new ol.layer.Vector({
     source: new ol.source.Vector({
-        url: 'si.geojson',
+        url: 'si_h01.geojson',
         format: new ol.format.GeoJSON()
     }),
     style: function(feature, resolution) {
